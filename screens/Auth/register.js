@@ -6,9 +6,35 @@
     ScrollView,
     View,
   } from "react-native";
+  import { useState } from "react";
   import TextInputComponent from "../../components/TextInputComponent";
+  import { registerUser } from "../../Src/Services/AuthService";
 
   export default function Register({ navigation }) {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [rol, setRol] = useState("");
+
+    const handleRegister = async () => {
+      if (password !== confirmPassword) {
+        Alert.alert("Error", "Las contraseñas no coinciden");
+        return;
+      }
+      if (!name || !email || !password || !rol) {
+        Alert.alert("Error", "Todos los campos son obligatorios");
+        return;
+      }
+      const result = await registerUser(name, email, password, rol);
+      if (result.success) {
+        Alert.alert("Éxito", result.message);
+        navigation.navigate("Login");
+      } else {
+        Alert.alert("Error", result.message);
+      }
+    };
+
     return (
       <ScrollView contentContainerStyle={styles.container}>
         {/* Tarjeta central */}
@@ -18,16 +44,44 @@
 
           {/* Inputs */}
           <View style={styles.form}>
-            {TextInputComponent("Nombre Completo", "Ej: Juan Pérez")}
-            {TextInputComponent("Correo Electrónico", "ejemplo@email.com")}
-            {TextInputComponent("Contraseña", "Mínimo 6 caracteres")}
-            {TextInputComponent("Confirmar Contraseña", "Repita la contraseña")}
+            <TextInputComponent
+              label="Nombre Completo"
+              placeholder="Ej: Juan Pérez"
+              value={name}
+              onChangeText={setName}
+            />
+            <TextInputComponent
+              label="Correo Electrónico"
+              placeholder="ejemplo@email.com"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInputComponent
+              label="Contraseña"
+              placeholder="Mínimo 6 caracteres"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+            <TextInputComponent
+              label="Confirmar Contraseña"
+              placeholder="Repita la contraseña"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
+            <TextInputComponent
+              label="Rol"
+              placeholder="Ej: admin, user"
+              value={rol}
+              onChangeText={setRol}
+            />
           </View>
 
           {/* Botón */}
           <TouchableOpacity
             style={styles.button}
-            onPress={() => Alert.alert("Cuenta creada", "Registro exitoso")}
+            onPress={handleRegister}
           >
             <Text style={styles.buttonText}>Registrarme</Text>
           </TouchableOpacity>
